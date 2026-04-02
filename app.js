@@ -3,6 +3,8 @@ const express = require("express");
 const connectDB = require("./config/db");
 const createAdmin = require("./utils/createAdmin");
 const authRoutes = require("./routes/authRoutes");
+const recordRoutes = require("./routes/recordRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 app.use(express.json());
@@ -21,5 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/records", recordRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.listen(5000, () => console.log("Server running on port 5000"));
