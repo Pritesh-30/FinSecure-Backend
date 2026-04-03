@@ -9,6 +9,7 @@ const {
   getBalance,
   getCategoryBreakdown,
   getTrends,
+  getRecentActivity,
 } = require("../controllers/dashboardController");
 
 // Total Income - Admin, Analyst, Viewer
@@ -40,5 +41,13 @@ router.get(
 
 // Get Trends - Admin, Analyst
 router.get("/trends", protect, authorizeRoles("admin", "analyst"), getTrends);
+
+// Get Recent Activity - Admin, Analyst, Viewer
+router.get(
+  "/recent",
+  protect,
+  authorizeRoles("admin", "analyst", "viewer"),
+  getRecentActivity
+);
 
 module.exports = router;

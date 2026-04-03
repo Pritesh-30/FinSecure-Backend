@@ -88,10 +88,24 @@ const getCategoryBreakdown = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const getRecentActivity = async (req, res) => {
+  try {
+    const records = await Record.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate("createdBy", "name email");
+
+    res.json(records);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 module.exports = {
   getTotalIncome,
   getTotalExpense,
   getBalance,
   getTrends,
   getCategoryBreakdown,
+  getRecentActivity,
 };
