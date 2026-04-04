@@ -1,5 +1,13 @@
 const User = require("../models/User");
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("name email role status");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 // Toggle user status (Admin only)
 const toggleUserStatus = async (req, res) => {
   try {
@@ -10,7 +18,8 @@ const toggleUserStatus = async (req, res) => {
     }
 
     // Toggle status
-    user.status = user.status === "active" ? "inactive" : "active";
+    const { status } = req.body;
+    user.status = status;
 
     await user.save();
 
@@ -23,4 +32,4 @@ const toggleUserStatus = async (req, res) => {
   }
 };
 
-module.exports = { toggleUserStatus };
+module.exports = { toggleUserStatus, getAllUsers };
