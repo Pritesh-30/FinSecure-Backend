@@ -1,5 +1,16 @@
 const Record = require("../models/Record");
 
+// Helper formatter
+const formatRecord = (r) => ({
+  id: r._id,
+  amount: r.amount,
+  type: r.type,
+  category: r.category,
+  date: r.date,
+  note: r.note,
+  createdBy: r.createdBy?.name,
+});
+
 // Create Record (Admin)
 const createRecord = async (req, res) => {
   try {
@@ -18,9 +29,12 @@ const createRecord = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    res.json(record);
+    res.json({
+      message: "Record created",
+      record: formatRecord(record),
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -33,9 +47,14 @@ const getRecords = async (req, res) => {
 
     if (type) filter.type = type;
     if (category) filter.category = category;
+
     if (startDate && endDate) {
-      filter.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+      filter.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
     }
+
     if (search) {
       filter.$or = [
         { category: { $regex: search, $options: "i" } },
@@ -43,37 +62,39 @@ const getRecords = async (req, res) => {
       ];
     }
 
-    const records = await Record.find(filter).populate(
-      "createdBy",
-      "name email"
-    );
+    const records = await Record.find(filter)
+      .populate("createdBy", "name")
+      .sort({ createdAt: -1 });
 
-    res.json(records);
+    res.json(records.map(formatRecord));
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Update Record - Admin
+// Update Record
 const updateRecord = async (req, res) => {
   try {
     const record = await Record.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
-    );
+    ).populate("createdBy", "name");
 
     if (!record) {
       return res.status(404).json({ message: "Record not found" });
     }
 
-    res.json(record);
+    res.json({
+      message: "Record updated",
+      record: formatRecord(record),
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-// Delete Record - Admin
+// Delete Record
 const deleteRecord = async (req, res) => {
   try {
     const record = await Record.findByIdAndDelete(req.params.id);
@@ -84,7 +105,7 @@ const deleteRecord = async (req, res) => {
 
     res.json({ message: "Record deleted" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 

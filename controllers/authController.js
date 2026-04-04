@@ -8,6 +8,15 @@ const generateToken = (user) => {
   });
 };
 
+// Helper to send user data
+const formatUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  status: user.status,
+});
+
 //Register User
 const registerUser = async (req, res) => {
   try {
@@ -22,9 +31,10 @@ const registerUser = async (req, res) => {
     res.json({
       message: "User registered",
       token: generateToken(user),
+      user: formatUser(user),
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -52,9 +62,10 @@ const loginUser = async (req, res) => {
     res.json({
       message: "Login successful",
       token: generateToken(user),
+      user: formatUser(user),
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -76,9 +87,9 @@ const forgotPassword = async (req, res) => {
 
     console.log(`🔐 OTP for ${email}: ${otp}`);
 
-    res.json({ message: "OTP sent (check console)" });
+    res.json({ message: "OTP sent" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -104,7 +115,7 @@ const resetPassword = async (req, res) => {
 
     res.json({ message: "Password reset successful" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
